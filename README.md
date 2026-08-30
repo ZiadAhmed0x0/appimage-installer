@@ -18,15 +18,12 @@ curl (The script will automatically attempt to install this using apt if it is m
 
 🚀 Usage
 Download the script to your local machine:
-git clone https://github.com/your-username/your-repo-name.gitcd your-repo-name
+git clone https://github.com/ZiadAhmed0x0/appimage-installer.gitcd appimage-installer
 Make the script executable:
 bash
-
 chmod +x install_appimage.sh
 Run the script:
-bash
-
-./install_appimage.sh
+bash appimage-installer.sh
 Follow the interactive prompts in the terminal:
 text
 
