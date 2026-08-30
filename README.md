@@ -1,4 +1,5 @@
-🐧 Universal AppImage Installer
+🐧 Universal AppImage Installer.
+
 A robust, interactive Bash script designed to streamline the installation and desktop 
 integration of Linux AppImages. Instead of manually downloading files, 
 setting permissions via terminal, and creating desktop shortcuts, this script automates the 
