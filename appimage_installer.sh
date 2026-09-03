@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # ============================================================================
 # PRINT BANNER & SYSTEM INFO
 # ============================================================================
@@ -35,7 +34,8 @@ echo -e "${CYAN}      |o_o |      ${NC}\"Software is free. Run it anywhere.\""
 echo -e "${CYAN}      |:_/ |      ${NC}No root, no repos, no restrictions."
 echo -e "${CYAN}     //   \ \     ${NC}"
 echo -e "${CYAN}    (|     | )    ${NC}${CYAN}OS:      ${NC}${WHITE}${OS_NAME}"
-echo -e "${CYAN}   /'\_   _/`\    ${NC}${CYAN}Kernel:  ${NC}${WHITE}${KERNEL}"
+# Escaped the backtick below with a \ so bash doesn't break!
+echo -e "${CYAN}   /'\_   _/\`    ${NC}${CYAN}Kernel:  ${NC}${WHITE}${KERNEL}"
 echo -e "${CYAN}   \___)=(___/    ${NC}${CYAN}Arch:    ${NC}${WHITE}${ARCH}"
 echo -e "${WHITE}------------------------------------------------------${NC}"
 echo ""
