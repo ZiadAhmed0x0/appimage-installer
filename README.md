@@ -1,5 +1,4 @@
-🐧 Universal AppImage Installer.
-
+🐧 Universal AppImage Installer
 A robust, interactive Bash script designed to streamline the installation and desktop 
 integration of Linux AppImages. Instead of manually downloading files, 
 setting permissions via terminal, and creating desktop shortcuts, this script automates the 
@@ -18,12 +17,15 @@ curl (The script will automatically attempt to install this using apt if it is m
 
 🚀 Usage
 Download the script to your local machine:
-git clone https://github.com/ZiadAhmed0x0/appimage-installer.gitcd appimage-installer
+git clone https://github.com/your-username/your-repo-name.gitcd your-repo-name
 Make the script executable:
 bash
+
 chmod +x install_appimage.sh
 Run the script:
-bash appimage-installer.sh
+bash
+
+./install_appimage.sh
 Follow the interactive prompts in the terminal:
 text
 

@@ -6,45 +6,42 @@
 # Description: Downloads, installs, and integrates AppImages into the
 #              Linux application menu automatically.
 # ============================================================================
-
-
 # ============================================================================
-# 1. ASK USER FOR URL
-# ============================================================================
-read -p "Please paste the AppImage download URL: " APP_URL
-
-# ============================================================================
-# 2. VALIDATE USER INPUT
+# 1. VALIDATE USER INPUT
 #    - Check if URL is empty
 #    - Check if URL matches a valid HTTP/HTTPS format
 #    - Clean the URL (removes tracking parameters like ?source=...)
 # ============================================================================
-if [ -z "$APP_URL" ]; then
-    echo "Error: No URL provided. Exiting."
-    exit 1
-fi
+VALID_URL="^https?://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(:[0-9]+)?(/.*)?$"
 
-if ! [[ "$APP_URL" =~ ^https?://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(:[0-9]+)?(/.*)?$ ]]; then
-    echo "Invalid URL. Exiting."
-    exit 1
-fi
+until [[ "$APP_URL" =~ $VALID_URL ]]; do
+  read -p "Please paste the AppImage download URL: " APP_URL
+
+  if [ -z "$APP_URL" ]; then
+    echo "Error: No URL provided. Please try again."
+
+  elif ! [[ "$APP_URL" =~ $VALID_URL ]]; then
+    echo "Error: Invalid URL Format. Please try again."
+  fi
+done
 
 echo "cleaning the URL"
 CLEAN_URL="${APP_URL%%\?*}"
 
 # ============================================================================
-# 3. EXTRACT FILE NAME
+# 2. EXTRACT FILE NAME
 # ============================================================================
 echo ""
 APP_NAME=$(basename "$CLEAN_URL")
 
 # ============================================================================
-# 4. SET SAVE DIRECTORY
+# 3. SET SAVE DIRECTORY
 #    - Prompt user for directory (default: ~/Applications)
 #    - Create directory if it doesn't exist
 # ============================================================================
 DEFAULT_SAVE_DIR="$HOME/Applications"
 
+until [ -d "$SAVE_DIR" ]; do
 read -e -p "Enter save directory [Press enter for default: $DEFAULT_SAVE_DIR]: " USER_DIR
 SAVE_DIR="${USER_DIR:-$DEFAULT_SAVE_DIR}"
 echo "You choose to save AppImage in: $SAVE_DIR"
@@ -55,20 +52,41 @@ if ! [[ -d "$SAVE_DIR" ]]; then
         mkdir -p "$SAVE_DIR"
         echo "Directory Created"
     else
-        echo "Please choose a valid directory and run the script again."
-        exit 1
+        echo "Please choose a valid directory."
     fi
 fi
+done
 
 # ============================================================================
-# 5. DOWNLOAD THE APPIMAGE
+# 4. DOWNLOAD THE APPIMAGE
 #    - Check if curl is installed; install if missing
 #    - Check if the AppImage has already been downloaded
 #    - Download using curl (fail safely on server errors)
 # ============================================================================
 if ! command -v curl &> /dev/null ; then
   echo "curl not found. Installing..."
-  sudo apt install curl -y
+
+# Check whats the distribution used
+  # Load OS information
+  if [[ -f /etc/os-release ]]; then
+	. /etc/os-release
+  else
+	echo "Error: Cannot detect linux distribution. Please install 'curl' manually"
+	exit 1
+  fi
+
+
+  # Check the distro ID and use the correct package manager
+  if [[ "$ID" == "debian" || "$ID" == "ubuntu" || "$ID_LIKE" == *"debian"* ]]; then
+	sudo apt update && sudo apt install curl -y
+  elif [[ "$ID" == "fedora" || "$ID_LIKE" == *"fedora"* ]]; then
+	sudo dnf install curl -y
+  elif [[ "$ID" == "void" ]]; then
+	sudo xbps-install -y curl
+  else
+	echo "Unsupported distribution ($ID). Please install 'curl' manually"
+    exit 1
+  fi
 fi
 
 if ! [[ -f "$SAVE_DIR/$APP_NAME" ]]; then
@@ -87,12 +105,12 @@ else
 fi
 
 # ============================================================================
-# 6. MAKE EXECUTABLE
+# 5. MAKE EXECUTABLE
 # ============================================================================
 chmod +x "$SAVE_DIR/$APP_NAME"
 
 # ============================================================================
-# 7. EXTRACT INTERNAL CONTENTS
+# 6. EXTRACT INTERNAL CONTENTS
 # ============================================================================
 echo "Extracting program icon and .desktop file..."
 cd "$SAVE_DIR"
@@ -100,7 +118,7 @@ cd "$SAVE_DIR"
 
 
 # ============================================================================
-# 8. FIND AND MOVE ASSETS
+# 7. FIND AND MOVE ASSETS
 #    - Search for .png/.svg icon and .desktop shortcut
 #    - Remove ".AppImage" extension for a clean application title
 #    - Copy icon to the system icons directory
@@ -122,21 +140,21 @@ else
 fi
 
 # ============================================================================
-# 9. AUTO-DETECT ELECTRON APPS
+# 8. AUTO-DETECT ELECTRON APPS
 #    - Check for 'chrome-sandbox' or 'resources/app.asar' files
 #    - Add --no-sandbox flag if it is an Electron app
 # ============================================================================
 RUN_ARGS=""
 
 if [[ -f "squashfs-root/chrome-sandbox" ]] || [[ -f "squashfs-root/resources/app.asar" ]]; then
-  echo "Electron app detected! Automaticly adding --no-sandbox."
+  echo "Electron app detected! Automatically adding --no-sandbox."
   RUN_ARGS="--no-sandbox"
 else
-  echo "Standard AppImage detected. No speacial arguments needed."
+  echo "Standard AppImage detected. No special arguments needed."
 fi
 
 # ============================================================================
-# 10. CREATE SHORTCUT (.DESKTOP FILE)
+# 9. CREATE SHORTCUT (.DESKTOP FILE)
 #     - Copy .desktop file to the applications menu directory
 #     - Modify Exec path to point to the actual AppImage (with args)
 #     - Modify Icon path to point to the newly extracted icon
@@ -158,10 +176,11 @@ else
   echo ".Desktop file already exist"
 fi
 # ============================================================================
-# 11. CLEAN UP AND FINISH
+# 10. CLEAN UP AND FINISH
 #     - Remove temporary squashfs-root folder
 # ============================================================================
 rm -rf "$SAVE_DIR/squashfs-root"
 
 echo ""
 echo "Success! $APP_TITLE is now in your application menu."
+
