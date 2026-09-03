@@ -1,5 +1,48 @@
 #!/bin/bash
 
+
+# ============================================================================
+# PRINT BANNER & SYSTEM INFO
+# ============================================================================
+RED='\033[1;31m'
+GREEN='\033[1;32m'
+CYAN='\033[0;36m'
+YELLOW='\033[1;33m'
+WHITE='\033[1;37m'
+NC='\033[0m' # No Color
+
+# Extract system information
+OS_NAME=$(grep PRETTY_NAME /etc/os-release 2>/dev/null | cut -d'"' -f2)
+if [ -z "$OS_NAME" ]; then
+    OS_NAME="Unknown Linux"
+fi
+KERNEL=$(uname -r)
+ARCH=$(uname -m)
+
+echo -e "${RED}"
+cat <<'EOF'
+ ███████ ██      ███████ ████████  ██████  ███    ██  ██████  
+ ██      ██      ██         ██    ██    ██ ████   ██ ██       
+ █████   ██      █████      ██    ██    ██ ██ ██  ██ ██   ███ 
+ ██      ██      ██         ██    ██    ██ ██  ██ ██ ██    ██ 
+ ███████ ███████ ███████    ██     ██████  ██   ████  ██████  
+EOF
+echo -e "${NC}"
+echo -e "${YELLOW}                 [ B r e a k i n g   C h a i n s ]${NC}"
+echo ""
+echo -e "${CYAN}       .--.       ${NC}Version 1.1.0 | Universal AppImage Installer"
+echo -e "${CYAN}      |o_o |      ${NC}\"Software is free. Run it anywhere.\""
+echo -e "${CYAN}      |:_/ |      ${NC}No root, no repos, no restrictions."
+echo -e "${CYAN}     //   \ \     ${NC}"
+echo -e "${CYAN}    (|     | )    ${NC}${CYAN}OS:      ${NC}${WHITE}${OS_NAME}"
+echo -e "${CYAN}   /'\_   _/`\    ${NC}${CYAN}Kernel:  ${NC}${WHITE}${KERNEL}"
+echo -e "${CYAN}   \___)=(___/    ${NC}${CYAN}Arch:    ${NC}${WHITE}${ARCH}"
+echo -e "${WHITE}------------------------------------------------------${NC}"
+echo ""
+
+
+
+
 # ============================================================================
 # UNIVERSAL APPIMAGE INSTALLER
 # ----------------------------------------------------------------------------
